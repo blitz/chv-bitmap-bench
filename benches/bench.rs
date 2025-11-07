@@ -28,7 +28,12 @@ fn criterion_benchmark(c: &mut Criterion) {
         VM_SIZE >> 40
     );
 
-    for dirty_permille in [1, 10, 50] {
+    for dirty_permille in [
+        0,  // The empty bitmap.
+        1,  // An almost empty bitmap
+        10, // Probably more realistic values
+        50,
+    ] {
         let dirty_bits = (DIRTY_VECTOR_LENGTH * (u64::BITS as usize) * dirty_permille) / 1000;
 
         let vec1 = black_box(random_bits_vector(DIRTY_VECTOR_LENGTH, dirty_bits));
