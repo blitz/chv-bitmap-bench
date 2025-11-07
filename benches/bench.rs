@@ -3,7 +3,7 @@ use std::hint::black_box;
 use criterion::{Criterion, criterion_group, criterion_main};
 use rand::{Rng, SeedableRng};
 
-use chv_bitmap_bench::{MemoryRangeTable, bitmap_to_memory_table, bitmap_to_memory_table2};
+use chv_bitmap_bench::{MemoryRangeTable, bitmap_to_memory_table, bitmap_to_memory_table_opt2};
 
 fn random_bits_vector(size: usize, bits: usize) -> Vec<u64> {
     let mut vec = vec![0; size];
@@ -43,7 +43,7 @@ fn criterion_benchmark(c: &mut Criterion) {
             b.iter(|| black_box(bitmap_to_memory_table(&vec1, &vec2)))
         });
         c.bench_function(&format!("dirty_log {dirty_permille} (optimized)"), |b| {
-            b.iter(|| black_box(bitmap_to_memory_table2(&vec1, &vec2)))
+            b.iter(|| black_box(bitmap_to_memory_table_opt2(&vec1, &vec2)))
         });
         c.bench_function(&format!("dirty_log {dirty_permille} (async)"), |b| {
             b.iter(|| {

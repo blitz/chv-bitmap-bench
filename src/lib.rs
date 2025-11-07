@@ -45,6 +45,7 @@ impl MemoryRangeTable {
         table
     }
 
+    /// Turn an iterator over the dirty bitmap into an iterator of dirty ranges.
     pub fn dirty_range_iter(
         bitmap: impl IntoIterator<Item = u64>,
         start_addr: u64,
@@ -68,6 +69,8 @@ impl MemoryRangeTable {
                 length: (r.end - r.start) * page_size,
             })
     }
+
+    /// Create the table from an iterator over the dirty bitmap.
     pub fn from_bitmap_iter(
         bitmap_iter: impl IntoIterator<Item = u64>,
         start_addr: u64,
@@ -95,7 +98,7 @@ pub fn bitmap_to_memory_table(bitmap1: &[u64], bitmap2: &[u64]) -> MemoryRangeTa
     MemoryRangeTable::from_bitmap(dirty_bitmap, 0, 4096)
 }
 
-pub fn bitmap_to_memory_table2(bitmap1: &[u64], bitmap2: &[u64]) -> MemoryRangeTable {
+pub fn bitmap_to_memory_table_opt2(bitmap1: &[u64], bitmap2: &[u64]) -> MemoryRangeTable {
     assert_eq!(bitmap1.len(), bitmap2.len());
 
     let dirty_bitmap_iter = bitmap1.iter().zip(bitmap2.iter()).map(|(x, y)| x | y);
@@ -120,7 +123,7 @@ mod tests {
             let bitmap2 = &bitmap2[..len];
 
             let result1 = bitmap_to_memory_table(bitmap1, bitmap2);
-            let result2 = bitmap_to_memory_table2(bitmap1, bitmap2);
+            let result2 = bitmap_to_memory_table_opt2(bitmap1, bitmap2);
 
             prop_assert_eq!(result1, result2);
         }
