@@ -23,22 +23,21 @@ where
             }
 
             let (word, word_bit) = self.current_word?;
-            if word != 0 {
-                let shifted_word = if word_bit < 64 { word >> word_bit } else { 0 };
 
+            // Continue early if there is no chance to find something.
+            if word != 0 && word_bit < 64 {
+                let shifted_word = word >> word_bit;
                 if shifted_word != 0 {
                     let zeroes = shifted_word.trailing_zeros();
 
-                    assert!(zeroes + word_bit <= 64);
-                    if zeroes + word_bit <= 64 {
-                        self.current_word = Some((word, zeroes + word_bit + 1));
-                        let next_bitpos = u64::try_from(self.word_pos).unwrap() * 64
-                            + u64::from(word_bit + zeroes);
+                    self.current_word = Some((word, zeroes + word_bit + 1));
+                    let next_bitpos =
+                        u64::try_from(self.word_pos).unwrap() * 64 + u64::from(word_bit + zeroes);
 
-                        return Some(next_bitpos);
-                    }
+                    return Some(next_bitpos);
                 }
             }
+
             self.current_word = None;
             self.word_pos += 1;
         }
@@ -72,6 +71,7 @@ mod tests {
         bitpos_check(&[1], &[0]);
         bitpos_check(&[5], &[0, 2]);
         bitpos_check(&[3 + 32], &[0, 1, 5]);
+        bitpos_check(&[1 << 63], &[63]);
 
         bitpos_check(&[1, 1 + 32], &[0, 64, 69]);
     }
